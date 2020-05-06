@@ -15,7 +15,7 @@ def upload_file(file_name, form, end, bucket):
       'aws_access_key_id':ACCESS_KEY_ID,
       'aws_secret_access_key':ACCESS_SECRET_KEY
     }
-    object_name = 'emotions/' + form["user_id"] + form["post_id"] + end
+    object_name = 'emotions/' + form["user_id"] + '_' + form["post_id"] + end
 
     # Upload the file
     s3_client = client('s3', **credentials)
