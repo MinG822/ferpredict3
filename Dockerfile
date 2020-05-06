@@ -5,11 +5,13 @@ Add patch/backend.py /tmp/backend.py
 
 EXPOSE 8000
 
-RUN apt-get -y update
-RUN apt-get -y upgrade
-RUN apt-get install -y ffmpeg
-RUN apt install -y default-jre
-RUN apt install -y default-jdk
+RUN mkdir -p /usr/share/man/man1
+# RUN apt-get -y update && apt-get -y upgrade && apt-get install -y ffmpeg openjdk-8-jdk
+RUN apt-get install -y software-properties-common && \
+    apt-get update && \
+    apt-get install -y ffmpeg && \
+    apt-get clean;
+RUN apt install -y default-jre default-jdk
 RUN conda env create -f /tmp/environment.yml
 
 # Create the environment:

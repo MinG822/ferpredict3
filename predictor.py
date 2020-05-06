@@ -38,15 +38,18 @@ class ScoringService(object):
 # The flask app for serving predictions
 app = flask.Flask(__name__)
 
-@app.route('/ping', methods=['GET'])
+prefix = '/model'
+
+@app.route(prefix + '/ping', methods=['GET'])
 def ping():
     """Determine if the container is working and healthy. In this sample container, we declare
     it healthy if we can load the model successfully."""
     health = ScoringService.get_model()  # You can insert a health check here
     status = 200 if health else 404
-    return flask.Response(response='\n', status=status, mimetype='application/json')
+    response = {"health": str(health), "kor_str": "안녕하세요"}
+    return flask.Response(response=json.dumps(response), status=status, mimetype='application/json')
 
-@app.route('/invocations', methods=['POST'])
+@app.route(prefix + '/invocations', methods=['POST'])
 def transformation():
     """Do an inference on a single batch of data. In this sample server, we take data as CSV, convert
     it to a pandas data frame for internal use and then convert the predictions back to CSV (which really
@@ -66,6 +69,8 @@ def transformation():
 
     # Do the prediction
     predictions = ScoringService.predict(data)
+    statistics = np.mean(predictions, axis=0)
+    statistics = statistics.tolist()
     np.savetxt('data/emotion.csv', predictions, delimiter=",")
     filename = util.upload_file('data/emotion.csv', form, '.csv', 'mind-gitter-diary')
     audio = util.upload_file('data/audio.wav', form, '.wav', 'mind-gitter-diary')
@@ -77,7 +82,8 @@ def transformation():
         "emotions": filename,
         "fulltext": text,
         "tags": keywords,
-        "abb": keysents
+        "abb": keysents,
+        "statistics": statistics
     }
 
     return flask.Response(response=json.dumps(result), status=200, mimetype='application/json')
