@@ -6,6 +6,8 @@ from decouple import config
 import logging, boto3, os, requests
 from botocore.exceptions import ClientError
 
+from datetime import datetime 
+
 def upload_file(file_name, form, end, bucket):
     ACCESS_KEY_ID = config('ACCESS_KEY_ID')
     ACCESS_SECRET_KEY = config('ACCESS_SECRET_KEY')
@@ -31,7 +33,7 @@ def speaking_to_text(filename, form):
   ACCESS_KEY_ID = config('ACCESS_KEY_ID')
   ACCESS_SECRET_KEY = config('ACCESS_SECRET_KEY')
   transcribe = boto3.client('transcribe', aws_access_key_id=ACCESS_KEY_ID, aws_secret_access_key=ACCESS_SECRET_KEY, region_name='ap-northeast-2')
-  job_name = "transcribe_"+form["user_id"]+"_"+form["post_id"]
+  job_name = "transcribe" + str(int(datetime.timestamp(datetime.now()))) #"transcribe_"+form["user_id"]+"_"+form["post_id"]_timestamp
   job_uri = "https://mind-gitter-diary.s3.ap-northeast-2.amazonaws.com/"+filename
   transcribe.start_transcription_job(
     TranscriptionJobName=job_name,
